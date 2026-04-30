@@ -7,24 +7,33 @@ const authRoutes = express.Router();
 
 // LOGIN ROUTE
 authRoutes.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const { email, password } = req.body || {};
 
-  if (user && (await bcrypt.compare(password, user.password))) {
-    // Generate JWT
-    const token = jwt.sign(
-      { id: user._id }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '1h' }
-    );
-    res.json({ token });
-  } else {
-    res.status(401).json({ message: 'Invalid credentials' });
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      // Generate JWT
+      const token = jwt.sign(
+        { id: user._id },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+      return res.json({ token });
+    }
+
+    return res.status(401).json({ message: 'Invalid credentials' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Login failed', error: err.message });
   }
 });
 
-// SIGNUP ROUTE
-authRoutes.post('/signup', async (req, res) => {
+// REGISTER ROUTE
+authRoutes.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
   try {
     const existingUser = await User.findOne({ email });

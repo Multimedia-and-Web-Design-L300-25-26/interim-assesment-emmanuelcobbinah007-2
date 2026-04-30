@@ -11,6 +11,16 @@ const app = express();
 connectToMongoDB();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Handle malformed JSON payloads from clients and return JSON error
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ message: 'Invalid JSON payload', error: err.message });
+  }
+  next();
+});
+
 app.use('/api/auth', authRoutes);
 
 // Define your routes here
