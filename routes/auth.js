@@ -23,7 +23,14 @@ authRoutes.post('/login', async (req, res) => {
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
       );
-      return res.json({ token });
+      return res.json({
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+        },
+      });
     }
 
     return res.status(401).json({ message: 'Invalid credentials' });
@@ -42,7 +49,23 @@ authRoutes.post('/register', async (req, res) => {
     }
     const newUser = new User({ name, email, password });
     await newUser.save();
-    res.status(201).json({ message: 'User created successfully' });
+    
+    // Generate JWT for the new user
+    const token = jwt.sign(
+      { id: newUser._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    
+    res.status(201).json({
+      message: 'User created successfully',
+      token,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

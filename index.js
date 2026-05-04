@@ -1,6 +1,8 @@
 import express from 'express';
 import connectToMongoDB from './utils/mongoConnection.js';
 import authRoutes from './routes/auth.js';
+import profileRoutes from './routes/profile.js';
+import cryptoRoutes from './routes/crypto.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -22,6 +24,8 @@ app.use((err, req, res, next) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/crypto', cryptoRoutes);
 
 // Define your routes here
 app.get('/', (req, res) => {

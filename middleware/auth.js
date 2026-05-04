@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 const protect = (req, res, next) => {
-     const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1]; // Format: "Bearer <token>"
 
   if (!token) return res.status(401).json({ message: 'No token provided' });
@@ -15,4 +15,4 @@ const protect = (req, res, next) => {
   }
 };
 
-module.exports = protect;
+export default protect;
